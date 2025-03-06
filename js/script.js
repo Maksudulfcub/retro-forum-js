@@ -7,14 +7,15 @@ const loadAllPost = async () => {
 
 const displayAllPost = (allPost) => {
     const allPostContainer = document.getElementById('all-post-container');
-
     for (const post of allPost) {
+        console.log(post);
         const allPostCard = document.createElement('div');
         allPostCard.classList = `lg:flex bg-gray-100 p-5 rounded-xl hover:bg-purple-100 mb-5`;
         allPostCard.innerHTML = `
                     <div>
                         <img class="w-1/3 rounded-lg" src="${post.image}" alt="">
-                        <img class="-mt-18 mx-12 lg:-mt-20 lg:mx-15" src="images/green.png" alt="">
+                        <img id="status-img-active" class="-mt-18 mx-12 lg:-mt-20 lg:mx-15" src="images/green.png" alt="">
+                        <img id="status-img-inactive" class="-mt-18 mx-12 lg:-mt-20 lg:mx-15 hidden" src="images/red.png" alt="">
                     </div>
                     <div class="lg:space-y-2 mt-20 lg:mt-0 mr-10">
                         <div class="text-gray-600 text-xs font-normal flex gap-4">
@@ -48,9 +49,16 @@ const displayAllPost = (allPost) => {
                     </div>
     `;
         allPostContainer.appendChild(allPostCard);
-        // const addToRead = document.getElementById('read-button').addEventListener('click',function(){
-        //     console.log('clicked')
-        // })
+
+        const statusActive = document.getElementById('status-img-active');
+        const statusInactive = document.getElementById('status-img-inactive');
+        if (post.isActive === false) {
+            statusInactive.classList.remove('hidden')
+        }
+        else {
+            statusActive.classList.add('hidden')
+        }
+
         document.querySelectorAll('.read-button').forEach(button => {
             button.addEventListener('click', function () {
                 const postId = this.getAttribute('data-id');
@@ -75,10 +83,28 @@ const displayAllPost = (allPost) => {
                 const updatedList = selectedBookNumber + 1;
                 listedBooks.innerText = updatedList;
             })
-        })
+        });
     }
 }
 
+const searchByCategory = async (categoryName) => {
+    const res = await fetch(`https://openapi.programming-hero.com/api/retro-forum/posts?category=${categoryName}`);
+    const data = await res.json();
+    console.log(data);
+    const allPostContainer = document.getElementById('all-post-container');
+    allPostContainer.textContent = '';
+}
+
+const handleSearch = () => {
+    const searchInput = document.getElementById('search-input');
+    const categoryName = searchInput.value;
+    if (categoryName) {
+        loadAllPost(categoryName);
+    }
+    else {
+        alert('Category Not Found !')
+    }
+}
 
 loadAllPost();
 
